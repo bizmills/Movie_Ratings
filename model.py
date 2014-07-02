@@ -1,14 +1,17 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.orm import sessionmaker 
-from datetime import datetime
+from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship, backref
 
-ENGINE = None
-Session = None
+engine = create_engine("sqlite:///ratings.db", echo=False)
+session = scoped_session(sessionmaker(bind=engine,
+                                      autocommit = False,
+                                      autoflush = False))
 
 Base = declarative_base()
-
+Base.query = session.query_property()
 ### Class declarations go here
 class User(Base):
     __tablename__ = "users"
@@ -19,6 +22,8 @@ class User(Base):
     age = Column(Integer, nullable=True)
     zipcode = Column(String(15), nullable=True)
 
+    # ratings = relationship("Ratings")
+
 class Movie(Base):
     __tablename__= "movies"
 
@@ -27,32 +32,34 @@ class Movie(Base):
     released_at = Column(DateTime, nullable = True)
     imdb_url = Column(String(100), nullable = True)
 
+    # ratings = relationship("Ratings")
+
 class Rating(Base):
     __tablename__ = "ratings"
 
     id = Column(Integer, primary_key = True)
-    movie_id = Column(Integer, nullable = True)
-    user_id = Column(Integer, nullable = True)
+    movie_id = Column(Integer, ForeignKey('movies.id'), nullable = True)
+    #ForeignKey says it references another column in another table
+    user_id = Column(Integer, ForeignKey('users.id'), nullable = True)
     rating = Column(Integer, nullable = True)
 
-### End class declarations
-def connect():
-    global ENGINE 
-    global Session
+    #This establish relationship between Rating and User objects with 'backref'
+    user = relationship("User", backref=backref("ratings", order_by=id))
 
-    ENGINE = create_engine("sqlite:///ratings.db", echo=False)
-    Session = sessionmaker(bind=ENGINE)
+    movie = relationship("Movie", backref=backref("ratings", order_by=id))
 
-    return Session()
+# ## End class declarations
+# def connect():
+#     global ENGINE 
+#     global Session
 
-# NON FUNCTIONING STRING PARSING FOR RELEASED_AT
-# def datetime(str_date): 
-#     date_obj = datetime.datetime.strptime(str_date, "%d-%b-%Y")
-#     return date_obj
+#     ENGINE = create_engine("sqlite:///ratings.db", echo=False)
+#     Session = sessionmaker(bind=ENGINE)
+
+#     return Session()
 
 def main():
     """In case we need this for something"""
-    pass
 
 if __name__ == "__main__":
     main()
