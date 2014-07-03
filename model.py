@@ -6,12 +6,12 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
 
 engine = create_engine("sqlite:///ratings.db", echo=False)
-session = scoped_session(sessionmaker(bind=engine,
+db_session = scoped_session(sessionmaker(bind=engine,
                                       autocommit = False,
                                       autoflush = False))
 
 Base = declarative_base()
-Base.query = session.query_property()
+Base.query = db_session.query_property()
 ### Class declarations go here
 class User(Base):
     __tablename__ = "users"
