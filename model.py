@@ -12,6 +12,7 @@ db_session = scoped_session(sessionmaker(bind=engine,
 
 Base = declarative_base()
 Base.query = db_session.query_property()
+
 ### Class declarations go here
 class User(Base):
     __tablename__ = "users"
@@ -44,6 +45,8 @@ class Rating(Base):
     rating = Column(Integer, nullable = True)
 
     #This establish relationship between Rating and User objects with 'backref'
+    #These are actually objects, entire user objects and movie objects
+    # user and movie objects are accessed through Rating objects
     user = relationship("User", backref=backref("ratings", order_by=id))
 
     movie = relationship("Movie", backref=backref("ratings", order_by=id))

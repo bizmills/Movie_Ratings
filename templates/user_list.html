@@ -1,5 +1,20 @@
-<html>
+{% extends 'base.html' %}
+{% block body %}
+<style>
+    body {
+        background-image: url("/static/img/background.jpg");
+        background-size: cover;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+    }
+
+    div.inner.cover img {
+        width: 150px;
+    }
+</style>
+<div>
 {% for user in users %}
-<h2>User {{ user.id }}, age {{ user.age }} has {{ user.ratings|length }} ratings</h2>
+<h2><a href="/user_details/{{ user.id }}">User{{ user.id }}</a>, age {{ user.age }} has {{ user.ratings|length }} ratings</h2>
 {% endfor %}
-</html>
+</div>
+{% endblock %}
